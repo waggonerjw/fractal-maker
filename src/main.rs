@@ -42,7 +42,7 @@ fn main() {
     println!("🦀: Image buffer generated.");
 
     println!("🦀: Saving image…");
-    img.save(config.path).expect("🦀Error: Failed to save image!");
+    img.save(config.path).expect("🦀Error: Failed to save image! Check the path arg");
     println!("🦀: Image saved.")
 }
 
@@ -58,7 +58,7 @@ struct Dimensions { x: u32, y: u32 }
 pub fn parse_args() -> Result<Config, ()> {
     if std::env::args().len() < 1 /*executable path*/ + 1 /*img file path*/ + 2 /*Dimensions*/ {
         println!("🦀Error: Too few args.");
-        println!("🦀Help: syntax follows: <program path> <output file path>\
+        println!("🦀Help: syntax follows: <program path> <output file path> \
             <file dimensions x> <file dimensions y> [c real val] [c imag value] [max iterations]");
         println!("🦀Help: Example: path/to/program myimage.png 1024 1024 -1 0 50");
         return Err(());
