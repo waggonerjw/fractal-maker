@@ -9,7 +9,7 @@ fn fract(xpos: f64, ypos: f64, creal: f32, cimag: f32, iterations: u32) -> f32 {
         real = newreal;
         imag = newimag;
         if (real * real + imag * imag).sqrt() > 4.0 {
-            return i as f32 / iterations as f32;
+            return i as f32;
         };
     }
     return 0f32;
@@ -30,14 +30,17 @@ fn main() {
         let ypos = y as f64 / config.dimensions.y as f64;
     
         //use our fract function to calculate the grayscale value of the pixel
-        let fractval = fract(xpos, ypos, config.creal, config.cimag, config.iterations);
+        let fractval = fract(xpos, ypos, config.creal, config.cimag, config.iterations) / 10.0;
         
-        //turn that grayscale value into our r g and b components
-        let r = (fractval * 255.0) as u8;
-        let g = (fractval * 255.0) as u8;
-        let b = (fractval * 255.0) as u8;
+        //3 phases for 3 color channels
+        let (p1, p2, p3) = three_phase_sine(fractval);
+
+        let r = (p1 + 1.0) / 2.0;
+        let g = (p2 + 1.0) / 2.0;
+        let b = (p3 + 1.0) / 2.0;
+
         //return the pixel
-        Rgb([r, g, b])
+        Rgb([(r * 255_f32) as u8, (g * 255_f32) as u8, (b * 255_f32) as u8])
     });
     println!("🦀: Image buffer generated.");
 
@@ -121,4 +124,16 @@ pub fn parse_args() -> Result<Config, ()> {
         cimag,
         iterations
     })
+}
+
+fn three_phase_sine(val: f32) -> (f32, f32, f32) {
+    let phase1_picomp = (0.0 * 2.0 * std::f32::consts::PI) / 3.0;
+    let phase2_picomp = (1.0 * 2.0 * std::f32::consts::PI) / 3.0;
+    let phase3_picomp = (2.0 * 2.0 * std::f32::consts::PI) / 3.0;
+
+    let phase1 = (val + phase1_picomp).sin();
+    let phase2 = (val + phase2_picomp).sin();
+    let phase3 = (val + phase3_picomp).sin();
+
+    (phase1, phase2, phase3)
 }
